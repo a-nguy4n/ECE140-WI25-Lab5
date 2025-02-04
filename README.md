@@ -46,7 +46,6 @@ Implement a query to analyze customer purchasing patterns by membership level an
 - Average order value
 - Number of customers
 - Orders per customer
-Only include groups with more than 100 customers.
 
 ### Assignment 4: Subquery and Advanced Analytics
 Implement a query to find products that are performing above average in their category, showing:
