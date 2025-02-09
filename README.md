@@ -46,7 +46,6 @@ Implement a query to analyze customer purchasing patterns by membership level an
 - Average order value
 - Number of customers
 - Orders per customer
-Only include groups with more than 100 customers.
 
 ### Assignment 4: Subquery and Advanced Analytics
 Implement a query to find products that are performing above average in their category, showing:
@@ -65,9 +64,11 @@ Implement a query to find products that are performing above average in their ca
    - `/assignment3`
    - `/assignment4`
 
-Each handler should return a JSON response with a "data" key containing the query results.
+Each handler should return a JSON response with the "data" key containing the query results (in a similar way to how the `get_table_data` function works).
 
 ## Database Schema
+
+PK = Primary Key, FK = Foreign Key
 
 ### Customers
 - customer_id (PK)
@@ -101,4 +102,5 @@ Each handler should return a JSON response with a "data" key containing the quer
 - Use appropriate JOIN types (INNER, LEFT, RIGHT) based on the requirements
 - Pay attention to NULL handling
 - Use appropriate aggregate functions
-- Consider using window functions for advanced analytics 
+- Consider using window functions for advanced analytics
+- The examples from the lab sessions will be helpful for these tasks!
