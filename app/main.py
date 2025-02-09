@@ -115,9 +115,9 @@ async def assignment1():
     # Basic JOIN query
     query = """
     SELECT 
+        SUM(orders.total_amount) AS total_spent,
         customers.name AS customer_name,
-        customers.email AS customer_email,
-        SUM(orders.total_amount) AS total_spent
+        customers.email AS customer_email
     FROM customers
     JOIN orders ON customers.customer_id = orders.customer_id
     GROUP BY customers.name, customers.email
