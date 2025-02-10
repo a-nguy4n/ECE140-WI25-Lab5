@@ -168,18 +168,25 @@ async def assignment2():
 @app.get("/assignment3")
 async def assignment3():
     # Complex JOIN with GROUP BY
+
+    ### Assignment 3: Complex JOIN with GROUP BY
+    # Implement a query to analyze customer purchasing patterns by membership level and city, showing:
+    # - Membership level
+    # - City
+    # - Total orders
+    # - Average order value
+    # - Number of customers
+    # - Orders per customer
     query = """
-    SELECT 
-        customers.membership_level,
-        customers.city,
-        COUNT(orders.order_id) AS total_orders,
-        AVG(orders.total_amount) AS avg_order_value,
-        COUNT(DISTINCT customers.customer_id) AS num_customers,
-        COUNT(orders.order_id) * 1.0 / COUNT(DISTINCT customers.customer_id) AS orders_per_customer
+     SELECT customers.membership_level, customers.city,
+        COUNT(*) AS total_orders,
+        AVG(orders.total_amount) AS average_order_value,
+        COUNT(DISTINCT customers.customer_id) AS number_customers,
+        COUNT(*) * 1.0 / COUNT(DISTINCT customers.customer_id) AS orders_per_customer
     FROM customers
     JOIN orders ON customers.customer_id = orders.customer_id
     GROUP BY customers.membership_level, customers.city
-    HAVING num_customers > 100;
+    HAVING number_customers > 100;
     """
     try:
         with get_db_connection() as connection:
@@ -202,32 +209,28 @@ async def assignment4():
     SELECT 
         products.name AS product_name,
         products.category,
-        SUM(order_items.quantity * order_items.unit_price) AS total_sales,
-        (SELECT AVG(sub.total_sales)
-         FROM (
-             SELECT products.category, 
-                    SUM(order_items.quantity * order_items.unit_price) AS total_sales
-             FROM products
-             JOIN order_items ON products.product_id = order_items.product_id
-             GROUP BY products.product_id
-         ) AS sub
-         WHERE sub.category = products.category
-        ) AS category_avg,
-        ((SUM(order_items.quantity * order_items.unit_price) - 
-          (SELECT AVG(sub.total_sales)
-           FROM (
-               SELECT products.category, 
-                      SUM(order_items.quantity * order_items.unit_price) AS total_sales
-               FROM products
-               JOIN order_items ON products.product_id = order_items.product_id
-               GROUP BY products.product_id
-           ) AS sub
-           WHERE sub.category = products.category
-         )) / category_avg) * 100 AS percentage_above_avg
+        product_sales.total_sales,
+        category_avg_data.category_avg,
+        ((product_sales.total_sales - category_avg_data.category_avg) / category_avg_data.category_avg) * 100 AS percentage_above_average
+    FROM (SELECT 
+        products.product_id,
+        products.name,
+        products.category,
+        SUM(order_items.quantity * order_items.unit_price) AS total_sales
     FROM products
     JOIN order_items ON products.product_id = order_items.product_id
-    GROUP BY products.product_id, products.category
-    HAVING total_sales > category_avg;
+    GROUP BY products.product_id, products.name, products.category ) 
+    AS product_sales
+    JOIN(
+    SELECT 
+        products.category,
+        AVG(SUM(order_items.quantity * order_items.unit_price)) AS category_average
+    FROM products
+    JOIN order_items ON products.product_id = order_items.product_id
+    GROUP BY products.category) 
+    AS category_average_data ON product_sales.category = category_average_data.category
+    HAVING product_sales.total_sales > category_average_data.category_average
+    ORDER BY percentage_above_average DESC;
     """
     try:
         with get_db_connection() as connection:
